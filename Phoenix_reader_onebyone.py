@@ -51,14 +51,20 @@ df_stat_Y['tab3']=merge[3].iloc[:, [2]]+correction_vector[1]
 df_stat_Y['tab4']=merge[4].iloc[:, [2]]+correction_vector[1]
 
 # =============================================================================
+# print("Mean X")
 # print(df_stat_X.mean(axis=1))
+# 
+# print("Mean Y")
 # print(df_stat_Y.mean(axis=1))
 # 
-# 
+# print("Std X")
 # print(df_stat_X.std(axis=1))
+# 
+# print("Std Y")
+# 
 # print(df_stat_Y.std(axis=1))
+# 
 # =============================================================================
-
 # implementer un moyen de stocker les mean/std dans un fichier externe
 # faire attention a la nomenclature !
 
