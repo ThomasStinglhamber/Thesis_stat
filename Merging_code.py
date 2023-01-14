@@ -144,15 +144,13 @@ for x in dir_list:
         df_stat_Xmean['tab4']=merge2[4].iloc[:, [0]]+correction_vector[0]
         #print(df_stat_X)
         
-# =============================================================================
-#         # j'enleve la position nominal X
-#         df_stat_Xmean['X (mm)']=X_nominal-df_stat_Xmean['X (mm)']
-#         df_stat_Xmean['tab1']=X_nominal-df_stat_Xmean['tab1']
-#         df_stat_Xmean['tab2']=X_nominal-df_stat_Xmean['tab2']
-#         df_stat_Xmean['tab3']=X_nominal-df_stat_Xmean['tab3']
-#         df_stat_Xmean['tab4']=X_nominal-df_stat_Xmean['tab4']
-#         
-# =============================================================================
+        # j'enleve la position nominal X
+        df_stat_Xmean['X (mm)']=X_nominal-df_stat_Xmean['X (mm)']
+        df_stat_Xmean['tab1']=X_nominal-df_stat_Xmean['tab1']
+        df_stat_Xmean['tab2']=X_nominal-df_stat_Xmean['tab2']
+        df_stat_Xmean['tab3']=X_nominal-df_stat_Xmean['tab3']
+        df_stat_Xmean['tab4']=X_nominal-df_stat_Xmean['tab4']
+        
         #df_stat_Xmean.to_excel('/Users/thomasstinglhamber/Desktop/dataXmean.xlsx',index=False)
         
         # Ici tableau selon Y
@@ -162,15 +160,13 @@ for x in dir_list:
         df_stat_Ymean['tab3']=merge2[3].iloc[:, [1]]+correction_vector[1]
         df_stat_Ymean['tab4']=merge2[4].iloc[:, [1]]+correction_vector[1]
         
-# =============================================================================
-#         # j'enleve la position nominal Y
-#         df_stat_Ymean['Y (mm)']=Y_nominal-df_stat_Ymean['Y (mm)']
-#         df_stat_Ymean['tab1']=Y_nominal-df_stat_Ymean['tab1']
-#         df_stat_Ymean['tab2']=Y_nominal-df_stat_Ymean['tab2']
-#         df_stat_Ymean['tab3']=Y_nominal-df_stat_Ymean['tab3']
-#         df_stat_Ymean['tab4']=Y_nominal-df_stat_Ymean['tab4']
-#         #print(df_stat_Y)
-# =============================================================================
+        # j'enleve la position nominal Y
+        df_stat_Ymean['Y (mm)']=Y_nominal-df_stat_Ymean['Y (mm)']
+        df_stat_Ymean['tab1']=Y_nominal-df_stat_Ymean['tab1']
+        df_stat_Ymean['tab2']=Y_nominal-df_stat_Ymean['tab2']
+        df_stat_Ymean['tab3']=Y_nominal-df_stat_Ymean['tab3']
+        df_stat_Ymean['tab4']=Y_nominal-df_stat_Ymean['tab4']
+        #print(df_stat_Y)
         
         
         #df_stat_Ymean.to_excel('/Users/thomasstinglhamber/Desktop/dataYmean.xlsx',index=False)
@@ -218,8 +214,8 @@ for x in dir_list:
         # =============================================================================
         
         if creat>0:
-            book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge.xlsx')
-            writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge.xlsx', engine='openpyxl')
+            book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge2.xlsx')
+            writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge2.xlsx', engine='openpyxl')
             writer.book = book
             writer.sheets = {ws.title: ws for ws in book.worksheets}
             
@@ -229,7 +225,7 @@ for x in dir_list:
             writer.save()
         
         if creat==0:
-            final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge.xlsx',index=False)
+            final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge2.xlsx',index=False)
             creat=creat+1
         
     
