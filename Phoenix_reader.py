@@ -1,14 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Dec 24 14:13:20 2022
-
-@author: thomasstinglhamber
-"""
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Nov 21 10:59:59 2022
+Created on Sun Jan  1 16:24:44 2023
 
 @author: thomasstinglhamber
 """
@@ -18,22 +11,43 @@ import matplotlib.pyplot as plt
 import numpy as np
 from openpyxl import load_workbook
 
+# Get the list of all files and directories
+merge=[]
+creat=0
+compt=1
 
-df = pd.read_excel('/Users/thomasstinglhamber/Desktop/SpotAnalysisResults_2022-12-09.xlsx', header=6)
+Angle = 270
+Energy= 70
+MU= 0.015
+#print('Angle :',Angle,'Energy :',Energy,'MU :',MU)
 
-Angle = 180
-Energy = 100
-Mu = 1
-correction_vector = [0.03,-1.01]
+df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure/2700700015.xlsx', header=6)
 
 
 
+
+if Angle  == 0:
+    correction_vector = [0.13,-1.06]
+if Angle  == 45:
+    correction_vector = [0.02,-1.53]
+if Angle  == 270:
+    correction_vector = [-0.01,-0.23]
+if Angle  == 180:
+    correction_vector = [-0.07,-0.20]
+if Angle  == 90:
+    correction_vector = [1.02,-0.44]
+
+fig, ax = plt.subplots()
+scatter = ax.scatter(df['X (mm)']+correction_vector[0], df['Y (mm)']+correction_vector[1], marker='o',label = df['Image Name'],cmap='viridis')
+legend = ax.legend(*scatter.legend_elements(), title="Map")
+ax.add_artist(legend)
 #---------------------------------------------------------
 
 X_nominal=[150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150]
 Y_nominal =[150,150,150,150,150,150,90,90,90,90,90,90,30,30,30,30,30,30,-30,-30,-30,-30,-30,-30,-90,-90,-90,-90,-90,-90,-150,-150,-150,-150,-150,-150]
 
-    
+
+tri1= [150,90,30,-30,-90,-150]
 
 # Je tri par nom pour separer les 5 images
 name=[]
@@ -44,92 +58,170 @@ for i in range(0,len(df.iloc[:, [0]])):
 
 # je met tout ces tableaux dans une liste "merge"
 merge=[]
+merge2=[]
 grouped = df.groupby(df['Image Name'])
 for k in name:
     df_new = grouped.get_group(k)
-    merge.append(df_new)
+    df_FINAL=pd.DataFrame()
+    
+    if len(df_new)>=36:  # check si MyQA a mal interpreter l'image
+        
+        df_new.sort_values(['Y (mm)','X (mm)'],
+                   ascending=[False,False], inplace=True,kind='mergesort')
+       
+        number=[]
+        sort1= [0,0,0,0,0,0]
+        sort2= [0,0,0,0,0,0]
+        
+        for k in range(len(tri1)): 
+            for j in range(len(df_new.iloc[:,[2]])):
+                # je tri en fonction d'un interval
+                if tri1[k]-30 <= float(df_new.iloc[j,[2]].to_string(index=False)) < tri1[k]+30:
+                    sort1[k]=sort1[k]+1
+                                    
+        somme=0
+        
+        for j in sort1:
+            df_new.iloc[somme:somme+j, [1,2]]= df_new.iloc[somme:somme+j, [1,2]].sort_values(['X (mm)'], 
+                       ascending=[False])
+            
+            df_transi= pd.DataFrame(df_new.iloc[somme:somme+j, [1,2,3,4]])
+            if j != 6:
+                
+                sort2= [0,0,0,0,0,0]
+                for m in range(len(tri1)):
+                    for r in range(len(df_transi.iloc[:,[0]])):
+                        
+                        if tri1[m]-30 <= float(df_transi.iloc[r,[0]].to_string(index=False)) < tri1[m]+30:
+                            sort2[m]=sort2[m]+1
+                            
+                somme2=0
+                for a,y in enumerate(sort2):
+                    df_transi.iloc[a,[2,3]]=0
+                    if y > 1:
+                        df_transi.iloc[a,[2,3]] = (df_transi.iloc[somme2:somme2+y,[0,1]]-tri1[a]).std()
+                    df_transi.iloc[a,[0,1]] = (df_transi.iloc[somme2:somme2+y,[0,1]]).mean()
+                    somme2=somme2+y
+                    
+                df_transi = df_transi.drop(df_transi.index[6:])
+                df_FINAL = df_FINAL.append(df_transi, ignore_index=True)
+            else : 
+                df_transi.iloc[:, [2,3]] = 0
+                
+                df_FINAL = df_FINAL.append(df_transi, ignore_index=True)
+            
+            
+            somme = somme +j
+        
+    
+        merge.append(df_FINAL)
+        merge2=merge
+    else : 
+        merge.append(df_new)
+        #Je tri tout ces tableaux selon Y
+        for i in range(0,len(merge)):
+            merge[i].sort_values(['Y (mm)','X (mm)'], 
+                       ascending=[False,False], inplace=True,kind='mergesort')
+        
+        #Je tri tout ces tableaux selon X
+        for i in range(0,len(merge)):
+            for j in [0,1,2,3,4,5]:
+                merge[i].iloc[0+6*j:6+6*j, [1,2]]= merge[i].iloc[0+6*j:6+6*j, [1,2]].sort_values(['X (mm)'], 
+                           ascending=[False])
+            
+            merge[i]=merge[i].reset_index(drop = True)
+            merge[i].iloc[:, [3,4]] = 0
+            merge2.append(merge[i].iloc[:, [1,2,3,4]])
+            
 
-#Je tri tout ces tableaux selon Y
-for i in range(0,len(merge)):
-    merge[i].sort_values(['Y (mm)','X (mm)'], 
-               ascending=[False,False], inplace=True,kind='mergesort')
-
-#Je tri tout ces tableaux selon X
-for i in range(0,len(merge)):
-    for j in [0,1,2,3,4,5]:
-        merge[i].iloc[0+6*j:6+6*j, [1,2]]= merge[i].iloc[0+6*j:6+6*j, [1,2]].sort_values(['X (mm)'], 
-                   ascending=[False])
-    #print(merge[i]) 
-    merge[i]=merge[i].reset_index(drop = True)
-      
-    #print(merge[i])   
-#print(merge)
-
+#merge[0].to_excel('/Users/thomasstinglhamber/Desktop/TESTT.xlsx',index=False)
 
 
 #je met tout les colonnes X et Y dans un tableau specifique pour calculer les mean et std
-df_stat_X= pd.DataFrame(merge[0].iloc[:, [1]])+correction_vector[0]
-df_stat_X['tab1']=merge[1].iloc[:, [1]]+correction_vector[0]
-df_stat_X['tab2']=merge[2].iloc[:, [1]]+correction_vector[0]
-df_stat_X['tab3']=merge[3].iloc[:, [1]]+correction_vector[0]
-df_stat_X['tab4']=merge[4].iloc[:, [1]]+correction_vector[0]
-#print(df_stat_X)
-# j'enleve la position nominal X
-df_stat_X['X (mm)']=X_nominal-df_stat_X['X (mm)']
-df_stat_X['tab1']=X_nominal-df_stat_X['tab1']
-df_stat_X['tab2']=X_nominal-df_stat_X['tab2']
-df_stat_X['tab3']=X_nominal-df_stat_X['tab3']
-df_stat_X['tab4']=X_nominal-df_stat_X['tab4']
+df_stat_Xmean= pd.DataFrame(merge2[0].iloc[:, [0]])+correction_vector[0]
+df_stat_Xmean['tab1']=merge2[1].iloc[:, [0]]+correction_vector[0]
+df_stat_Xmean['tab2']=merge2[2].iloc[:, [0]]+correction_vector[0]
+df_stat_Xmean['tab3']=merge2[3].iloc[:, [0]]+correction_vector[0]
+df_stat_Xmean['tab4']=merge2[4].iloc[:, [0]]+correction_vector[0]
 #print(df_stat_X)
 
+# j'enleve la position nominal X
+# =============================================================================
+# df_stat_Xmean['X (mm)']=X_nominal-df_stat_Xmean['X (mm)']
+# df_stat_Xmean['tab1']=X_nominal-df_stat_Xmean['tab1']
+# df_stat_Xmean['tab2']=X_nominal-df_stat_Xmean['tab2']
+# df_stat_Xmean['tab3']=X_nominal-df_stat_Xmean['tab3']
+# df_stat_Xmean['tab4']=X_nominal-df_stat_Xmean['tab4']
+# 
+# =============================================================================
+df_stat_Xmean.to_excel('/Users/thomasstinglhamber/Desktop/dataXmean.xlsx',index=False)
 
 # Ici tableau selon Y
-df_stat_Y= pd.DataFrame(merge[0].iloc[:, [2]])+correction_vector[1]
-df_stat_Y['tab1']=merge[1].iloc[:, [2]]+correction_vector[1]
-df_stat_Y['tab2']=merge[2].iloc[:, [2]]+correction_vector[1]
-df_stat_Y['tab3']=merge[3].iloc[:, [2]]+correction_vector[1]
-df_stat_Y['tab4']=merge[4].iloc[:, [2]]+correction_vector[1]
-#print(df_stat_Y)
+df_stat_Ymean= pd.DataFrame(merge2[0].iloc[:, [1]])+correction_vector[1]
+df_stat_Ymean['tab1']=merge2[1].iloc[:, [1]]+correction_vector[1]
+df_stat_Ymean['tab2']=merge2[2].iloc[:, [1]]+correction_vector[1]
+df_stat_Ymean['tab3']=merge2[3].iloc[:, [1]]+correction_vector[1]
+df_stat_Ymean['tab4']=merge2[4].iloc[:, [1]]+correction_vector[1]
+
 # j'enleve la position nominal Y
-df_stat_Y['Y (mm)']=Y_nominal-df_stat_Y['Y (mm)']
-df_stat_Y['tab1']=Y_nominal-df_stat_Y['tab1']
-df_stat_Y['tab2']=Y_nominal-df_stat_Y['tab2']
-df_stat_Y['tab3']=Y_nominal-df_stat_Y['tab3']
-df_stat_Y['tab4']=Y_nominal-df_stat_Y['tab4']
-#print(df_stat_Y)
-
 # =============================================================================
-# #creation du plot pour vérifier les points et la mean/std
-# plt.figure()
-# plt.scatter(df_stat_X.mean(axis=1),df_stat_Y.mean(axis=1),c='red',marker='x')
-# #plt.scatter(df['X 2D Fit (mm)'],df['Y 2D Fit (mm)'],marker='.')
-# # =============================================================================
-# # for l in range(0,len(merge)):
-# #     plt.scatter(merge[l]['X (mm)']+correction_vector[0],merge[l]['Y (mm)']+correction_vector[1],marker='.',label=merge[l].iloc[1,[0]].to_string(index=False))
-# # plt.legend()
-# # =============================================================================
-# 
-# plt.show()
-# 
+# df_stat_Ymean['Y (mm)']=Y_nominal-df_stat_Ymean['Y (mm)']
+# df_stat_Ymean['tab1']=Y_nominal-df_stat_Ymean['tab1']
+# df_stat_Ymean['tab2']=Y_nominal-df_stat_Ymean['tab2']
+# df_stat_Ymean['tab3']=Y_nominal-df_stat_Ymean['tab3']
+# df_stat_Ymean['tab4']=Y_nominal-df_stat_Ymean['tab4']
+# #print(df_stat_Y)
 # =============================================================================
 
-# implementer un moyen de stocker les mean/std dans un fichier externe
-# faire attention a la nomenclature !
+
+df_stat_Ymean.to_excel('/Users/thomasstinglhamber/Desktop/dataYmean.xlsx',index=False)
+
+df_stat_Xstd= pd.DataFrame(merge2[0].iloc[:, [2]])
+df_stat_Xstd['tab1']=merge2[1].iloc[:, [2]]
+df_stat_Xstd['tab2']=merge2[2].iloc[:, [2]]
+df_stat_Xstd['tab3']=merge2[3].iloc[:, [2]]
+df_stat_Xstd['tab4']=merge2[4].iloc[:, [2]]
+
+df_stat_Xstd['sommequadX']=(np.sqrt(merge2[0].iloc[:, [2]]**2 +merge2[1].iloc[:, [2]]**2 +merge2[2].iloc[:, [2]]**2 +merge2[3].iloc[:, [2]]**2 +merge2[4].iloc[:, [2]]**2))
+
+df_stat_Xstd.to_excel('/Users/thomasstinglhamber/Desktop/dataXstd.xlsx',index=False)
+
+
+
+df_stat_Ystd= pd.DataFrame(merge2[0].iloc[:, [3]])
+df_stat_Ystd['tab1']=merge2[1].iloc[:, [3]]
+df_stat_Ystd['tab2']=merge2[2].iloc[:, [3]]
+df_stat_Ystd['tab3']=merge2[3].iloc[:, [3]]
+df_stat_Ystd['tab4']=merge2[4].iloc[:, [3]]
+
+df_stat_Ystd['sommequadY']=(np.sqrt(merge2[0].iloc[:, [3]]**2 +merge2[1].iloc[:, [3]]**2 +merge2[2].iloc[:, [3]]**2 +merge2[3].iloc[:, [3]]**2 +merge2[4].iloc[:, [3]]**2))
+
+df_stat_Ystd.to_excel('/Users/thomasstinglhamber/Desktop/dataYstd.xlsx',index=False)
 
 final=pd.DataFrame()
 
 
 final['Angle']= [Angle]*36
-final['Mu']= [Mu]*36
+final['Mu']= [MU]*36
 final['Energy']= [Energy]*36
 
-final['Moyenne_X']= df_stat_X.mean(axis=1)
-final['Moyenne_Y']= df_stat_Y.mean(axis=1)
+final['Moyenne_X']= df_stat_Xmean.mean(axis=1)
+final['Moyenne_Y']= df_stat_Ymean.mean(axis=1)
 
-final['Std_X']= df_stat_X.std(axis=1)
-final['Std_Y']= df_stat_Y.std(axis=1)
+final['Std_X']= np.sqrt(df_stat_Xmean.std(axis=1)**2+df_stat_Xstd['sommequadX']**2)
+final['Std_Y']= np.sqrt(df_stat_Ymean.std(axis=1)**2+df_stat_Ystd['sommequadY']**2)
 
-#print(final)
+
+#creation du plot pour vérifier les points et la mean/std
+#plt.figure()
+plt.scatter(df_stat_Xmean.mean(axis=1),df_stat_Ymean.mean(axis=1),c='red',marker='x')
+#plt.scatter(df['X 2D Fit (mm)'],df['Y 2D Fit (mm)'],marker='.')
+for l in range(0,len(merge2)):
+    plt.scatter(merge2[l]['X (mm)']+correction_vector[0],merge2[l]['Y (mm)']+correction_vector[1],marker='.',label=merge2[l].iloc[1,[0]].to_string(index=False))
+#plt.legend()
+
+plt.show()
+
 
 #Si on veut trier l'excel de X
 # =============================================================================
@@ -137,19 +229,5 @@ final['Std_Y']= df_stat_Y.std(axis=1)
 # df_stat_X=df_stat_X.reset_index(drop = True)
 # =============================================================================
 
-final.to_excel('/Users/thomasstinglhamber/Desktop/dataX.xlsx',index=False)
 
 
-
-# =============================================================================
-# book = load_workbook('/Users/thomasstinglhamber/Desktop/dataX.xlsx')
-# writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/dataX.xlsx', engine='openpyxl')
-# writer.book = book
-# writer.sheets = {ws.title: ws for ws in book.worksheets}
-# 
-# for sheetname in writer.sheets:
-#     final.to_excel(writer,sheet_name=sheetname, startrow=writer.sheets[sheetname].max_row, index = False,header= False)
-# 
-# writer.save()
-# 
-# =============================================================================
