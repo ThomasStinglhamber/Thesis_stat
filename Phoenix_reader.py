@@ -21,10 +21,19 @@ Energy= 70
 MU= 0.015
 #print('Angle :',Angle,'Energy :',Energy,'MU :',MU)
 
-df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure/2700700015.xlsx', header=6)
+df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure/0450700015.xlsx', header=6)
 
 
-
+reference = 5
+if MU ==0.015 and Energy not in [226,200,150,100]:
+    
+    # Get the index of the rows where the value in the "sigmax" column is lower than the reference
+    to_drop =  df[(df['Sigma X (mm)'] < reference) | (df['Sigma Y (mm)'] < reference)].index
+    # Delete the rows
+   # print(Angle,MU,Energy)
+    df.drop(to_drop, inplace=True)
+   
+else: pass
 
 if Angle  == 0:
     correction_vector = [0.13,-1.06]
@@ -154,7 +163,7 @@ df_stat_Xmean['tab4']=merge2[4].iloc[:, [0]]+correction_vector[0]
 # df_stat_Xmean['tab4']=X_nominal-df_stat_Xmean['tab4']
 # 
 # =============================================================================
-df_stat_Xmean.to_excel('/Users/thomasstinglhamber/Desktop/dataXmean.xlsx',index=False)
+#df_stat_Xmean.to_excel('/Users/thomasstinglhamber/Desktop/dataXmean.xlsx',index=False)
 
 # Ici tableau selon Y
 df_stat_Ymean= pd.DataFrame(merge2[0].iloc[:, [1]])+correction_vector[1]
@@ -174,7 +183,7 @@ df_stat_Ymean['tab4']=merge2[4].iloc[:, [1]]+correction_vector[1]
 # =============================================================================
 
 
-df_stat_Ymean.to_excel('/Users/thomasstinglhamber/Desktop/dataYmean.xlsx',index=False)
+#df_stat_Ymean.to_excel('/Users/thomasstinglhamber/Desktop/dataYmean.xlsx',index=False)
 
 df_stat_Xstd= pd.DataFrame(merge2[0].iloc[:, [2]])
 df_stat_Xstd['tab1']=merge2[1].iloc[:, [2]]
@@ -184,7 +193,7 @@ df_stat_Xstd['tab4']=merge2[4].iloc[:, [2]]
 
 df_stat_Xstd['sommequadX']=(np.sqrt(merge2[0].iloc[:, [2]]**2 +merge2[1].iloc[:, [2]]**2 +merge2[2].iloc[:, [2]]**2 +merge2[3].iloc[:, [2]]**2 +merge2[4].iloc[:, [2]]**2))
 
-df_stat_Xstd.to_excel('/Users/thomasstinglhamber/Desktop/dataXstd.xlsx',index=False)
+#df_stat_Xstd.to_excel('/Users/thomasstinglhamber/Desktop/dataXstd.xlsx',index=False)
 
 
 
@@ -196,7 +205,7 @@ df_stat_Ystd['tab4']=merge2[4].iloc[:, [3]]
 
 df_stat_Ystd['sommequadY']=(np.sqrt(merge2[0].iloc[:, [3]]**2 +merge2[1].iloc[:, [3]]**2 +merge2[2].iloc[:, [3]]**2 +merge2[3].iloc[:, [3]]**2 +merge2[4].iloc[:, [3]]**2))
 
-df_stat_Ystd.to_excel('/Users/thomasstinglhamber/Desktop/dataYstd.xlsx',index=False)
+#df_stat_Ystd.to_excel('/Users/thomasstinglhamber/Desktop/dataYstd.xlsx',index=False)
 
 final=pd.DataFrame()
 

@@ -12,7 +12,11 @@ import numpy as np
 from openpyxl import load_workbook
 
 # Get the list of all files and directories
-path = '/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure'
+# /Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure
+# /Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur exp
+#path = '/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure'
+path = '/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_exp'
+
 dir_list = os.listdir(path)
 merge=[]
 creat=0
@@ -27,8 +31,22 @@ for x in dir_list:
         MU= int(x[6:10])/1000
         #print('Angle :',Angle,'Energy :',Energy,'MU :',MU)
         
-        df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure/'+str(x), header=6)
+        df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_exp/'+str(x), header=6)
         
+        
+        reference = 3
+        if MU ==0.015 and Energy not in [226,200,150]:
+            
+            # Get the index of the rows where the value in the "sigmax" column is lower than the reference
+            to_drop = df[(df['Sigma X (mm)'] < reference) | (df['Sigma Y (mm)'] < reference)].index
+            
+            # Delete the rows
+            print(Angle,MU,Energy)
+            df.drop(to_drop, inplace=True)
+           
+        else: pass
+                    
+                    
         if Angle  == 0:
             correction_vector = [0.13,-1.06]
         if Angle  == 45:
@@ -85,8 +103,10 @@ for x in dir_list:
                                ascending=[False])
                     
                     df_transi= pd.DataFrame(df_new.iloc[somme:somme+j, [1,2,3,4]])
+                    #print(df_transi)
                     if j != 6:
                         
+                    
                         sort2= [0,0,0,0,0,0]
                         for m in range(len(tri1)):
                             for r in range(len(df_transi.iloc[:,[0]])):
@@ -214,8 +234,8 @@ for x in dir_list:
         # =============================================================================
         
         if creat>0:
-            book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge2.xlsx')
-            writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge2.xlsx', engine='openpyxl')
+            book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_setup.xlsx')
+            writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_setup.xlsx', engine='openpyxl')
             writer.book = book
             writer.sheets = {ws.title: ws for ws in book.worksheets}
             
@@ -225,7 +245,7 @@ for x in dir_list:
             writer.save()
         
         if creat==0:
-            final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Merge2.xlsx',index=False)
+            final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_setup.xlsx',index=False)
             creat=creat+1
         
     
