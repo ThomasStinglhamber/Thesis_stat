@@ -99,13 +99,15 @@ for x in dir_list:
             df_stat_Xmean['tab3']=merge2[3].iloc[:, [3]]
             df_stat_Xmean['tab4']=merge2[4].iloc[:, [3]]
             #print(df_stat_Xmean)
-            # j'enleve la position nominal X
-            df_stat_Xmean['X']=X_nominal-df_stat_Xmean['X']
-            df_stat_Xmean['tab1']=X_nominal-df_stat_Xmean['tab1']
-            df_stat_Xmean['tab2']=X_nominal-df_stat_Xmean['tab2']
-            df_stat_Xmean['tab3']=X_nominal-df_stat_Xmean['tab3']
-            df_stat_Xmean['tab4']=X_nominal-df_stat_Xmean['tab4']
-            #print(df_stat_Xmean)
+# =============================================================================
+#             # j'enleve la position nominal X
+#             df_stat_Xmean['X']=X_nominal-df_stat_Xmean['X']
+#             df_stat_Xmean['tab1']=X_nominal-df_stat_Xmean['tab1']
+#             df_stat_Xmean['tab2']=X_nominal-df_stat_Xmean['tab2']
+#             df_stat_Xmean['tab3']=X_nominal-df_stat_Xmean['tab3']
+#             df_stat_Xmean['tab4']=X_nominal-df_stat_Xmean['tab4']
+#             #print(df_stat_Xmean)
+# =============================================================================
                 
             # Ici tableau selon Y
             df_stat_Ymean= pd.DataFrame(merge2[0].iloc[:, [4]])
@@ -114,13 +116,15 @@ for x in dir_list:
             df_stat_Ymean['tab3']=merge2[3].iloc[:, [4]]
             df_stat_Ymean['tab4']=merge2[4].iloc[:, [4]]
             
-            # j'enleve la position nominal Y
-            df_stat_Ymean['Y']=Y_nominal-df_stat_Ymean['Y']
-            df_stat_Ymean['tab1']=Y_nominal-df_stat_Ymean['tab1']
-            df_stat_Ymean['tab2']=Y_nominal-df_stat_Ymean['tab2']
-            df_stat_Ymean['tab3']=Y_nominal-df_stat_Ymean['tab3']
-            df_stat_Ymean['tab4']=Y_nominal-df_stat_Ymean['tab4']
-            #print(df_stat_Ymean)
+# =============================================================================
+#             # j'enleve la position nominal Y
+#             df_stat_Ymean['Y']=Y_nominal-df_stat_Ymean['Y']
+#             df_stat_Ymean['tab1']=Y_nominal-df_stat_Ymean['tab1']
+#             df_stat_Ymean['tab2']=Y_nominal-df_stat_Ymean['tab2']
+#             df_stat_Ymean['tab3']=Y_nominal-df_stat_Ymean['tab3']
+#             df_stat_Ymean['tab4']=Y_nominal-df_stat_Ymean['tab4']
+#             #print(df_stat_Ymean)
+# =============================================================================
                 
             final=pd.DataFrame()
             
@@ -162,7 +166,12 @@ for x in dir_list:
                 MU=5
                 
                 
-
+            #print(merge2[1].iloc[:, [1]].to_string(index=False))
+            mu_to_pd = merge2[1].iloc[:, [1]].to_string(index=False).split()
+            #print(mu_to_pd[1:])
+            energy_to_pd = merge2[1].iloc[:, [2]].to_string(index=False).split()
+            angle_to_pd = merge2[1].iloc[:, [0]].to_string(index=False).split()
+            
             final['Angle']= [Angle]*36
             final['Mu']= [MU]*36
             final['Energy']= [Energy]*36
@@ -173,11 +182,17 @@ for x in dir_list:
             final['Std_X']= df_stat_Xmean.std(axis=1)
             final['Std_Y']= df_stat_Ymean.std(axis=1)
             
-            #print(final)
+            final['Nominal_X']= X_nominal
+            final['Nominal_Y']= Y_nominal
+            
+            final['True_Angle']= angle_to_pd[1:]
+            final['True_Energy']= energy_to_pd[1:]
+            final['True_Mu']= mu_to_pd[1:]
+            
             
             if creat>0:
-                book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Nominal_Log.xlsx')
-                writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Nominal_Log.xlsx', engine='openpyxl')
+                book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New/Log.xlsx')
+                writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New/Log.xlsx', engine='openpyxl')
                 writer.book = book
                 writer.sheets = {ws.title: ws for ws in book.worksheets}
                 
@@ -187,7 +202,7 @@ for x in dir_list:
                 writer.save()
         
             if creat==0:
-                final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Nominal_Log.xlsx',index=False)
+                final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New/Log.xlsx',index=False)
                 creat=creat+1
                 
              

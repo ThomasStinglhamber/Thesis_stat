@@ -14,8 +14,8 @@ from openpyxl import load_workbook
 # Get the list of all files and directories
 # /Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure
 # /Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur exp
-#path = '/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure'
-path = '/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_exp'
+path = '/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure'
+#path = '/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_exp'
 
 dir_list = os.listdir(path)
 merge=[]
@@ -24,14 +24,14 @@ compt=1
 for x in dir_list:
     print(compt,'/',150)
     compt=compt+1
-    if x.endswith(".xlsx"):
+    if x.endswith("_2.xlsx"):
         # Prints only text file present in My Folder
         Angle = int(x[0:3])
         Energy= int(x[3:6])
         MU= int(x[6:10])/1000
         #print('Angle :',Angle,'Energy :',Energy,'MU :',MU)
-        
-        df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_exp/'+str(x), header=6)
+        print(x)
+        df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Mesure/'+str(x), header=6)
         
         
         reference = 3
@@ -48,15 +48,15 @@ for x in dir_list:
                     
                     
         if Angle  == 0:
-            correction_vector = [0.13,-1.06]
+            correction_vector = [-0.12,1.13]
         if Angle  == 45:
-            correction_vector = [0.02,-1.53]
+            correction_vector = [0.04,1.47]
         if Angle  == 270:
-            correction_vector = [-0.01,-0.23]
+            correction_vector = [-0.01,0.29]
         if Angle  == 180:
-            correction_vector = [-0.07,-0.20]
+            correction_vector = [0.1,0.42]
         if Angle  == 90:
-            correction_vector = [1.02,-0.44]
+            correction_vector = [-0.99,0.47]
 
         #---------------------------------------------------------
         
@@ -157,35 +157,35 @@ for x in dir_list:
         
         
         #je met tout les colonnes X et Y dans un tableau specifique pour calculer les mean et std
-        df_stat_Xmean= pd.DataFrame(merge2[0].iloc[:, [0]])+correction_vector[0]
-        df_stat_Xmean['tab1']=merge2[1].iloc[:, [0]]+correction_vector[0]
-        df_stat_Xmean['tab2']=merge2[2].iloc[:, [0]]+correction_vector[0]
-        df_stat_Xmean['tab3']=merge2[3].iloc[:, [0]]+correction_vector[0]
-        df_stat_Xmean['tab4']=merge2[4].iloc[:, [0]]+correction_vector[0]
+        df_stat_Xmean= pd.DataFrame(merge2[0].iloc[:, [0]])-correction_vector[0]
+        df_stat_Xmean['tab1']=merge2[1].iloc[:, [0]]-correction_vector[0]
+        df_stat_Xmean['tab2']=merge2[2].iloc[:, [0]]-correction_vector[0]
+        df_stat_Xmean['tab3']=merge2[3].iloc[:, [0]]-correction_vector[0]
+        df_stat_Xmean['tab4']=merge2[4].iloc[:, [0]]-correction_vector[0]
         #print(df_stat_X)
         
         # j'enleve la position nominal X
-        df_stat_Xmean['X (mm)']=X_nominal-df_stat_Xmean['X (mm)']
-        df_stat_Xmean['tab1']=X_nominal-df_stat_Xmean['tab1']
-        df_stat_Xmean['tab2']=X_nominal-df_stat_Xmean['tab2']
-        df_stat_Xmean['tab3']=X_nominal-df_stat_Xmean['tab3']
-        df_stat_Xmean['tab4']=X_nominal-df_stat_Xmean['tab4']
+        df_stat_Xmean['X (mm)']=df_stat_Xmean['X (mm)']-X_nominal
+        df_stat_Xmean['tab1']=df_stat_Xmean['tab1']-X_nominal
+        df_stat_Xmean['tab2']=df_stat_Xmean['tab2']-X_nominal
+        df_stat_Xmean['tab3']=df_stat_Xmean['tab3']-X_nominal
+        df_stat_Xmean['tab4']=df_stat_Xmean['tab4']-X_nominal
         
         #df_stat_Xmean.to_excel('/Users/thomasstinglhamber/Desktop/dataXmean.xlsx',index=False)
         
         # Ici tableau selon Y
-        df_stat_Ymean= pd.DataFrame(merge2[0].iloc[:, [1]])+correction_vector[1]
-        df_stat_Ymean['tab1']=merge2[1].iloc[:, [1]]+correction_vector[1]
-        df_stat_Ymean['tab2']=merge2[2].iloc[:, [1]]+correction_vector[1]
-        df_stat_Ymean['tab3']=merge2[3].iloc[:, [1]]+correction_vector[1]
-        df_stat_Ymean['tab4']=merge2[4].iloc[:, [1]]+correction_vector[1]
+        df_stat_Ymean= pd.DataFrame(merge2[0].iloc[:, [1]])-correction_vector[1]
+        df_stat_Ymean['tab1']=merge2[1].iloc[:, [1]]-correction_vector[1]
+        df_stat_Ymean['tab2']=merge2[2].iloc[:, [1]]-correction_vector[1]
+        df_stat_Ymean['tab3']=merge2[3].iloc[:, [1]]-correction_vector[1]
+        df_stat_Ymean['tab4']=merge2[4].iloc[:, [1]]-correction_vector[1]
         
         # j'enleve la position nominal Y
-        df_stat_Ymean['Y (mm)']=Y_nominal-df_stat_Ymean['Y (mm)']
-        df_stat_Ymean['tab1']=Y_nominal-df_stat_Ymean['tab1']
-        df_stat_Ymean['tab2']=Y_nominal-df_stat_Ymean['tab2']
-        df_stat_Ymean['tab3']=Y_nominal-df_stat_Ymean['tab3']
-        df_stat_Ymean['tab4']=Y_nominal-df_stat_Ymean['tab4']
+        df_stat_Ymean['Y (mm)']=df_stat_Ymean['Y (mm)']-Y_nominal
+        df_stat_Ymean['tab1']=df_stat_Ymean['tab1']-Y_nominal
+        df_stat_Ymean['tab2']=df_stat_Ymean['tab2']-Y_nominal
+        df_stat_Ymean['tab3']=df_stat_Ymean['tab3']-Y_nominal
+        df_stat_Ymean['tab4']=df_stat_Ymean['tab4']-Y_nominal
         #print(df_stat_Y)
         
         
@@ -226,6 +226,9 @@ for x in dir_list:
         final['Std_X']= np.sqrt(df_stat_Xmean.std(axis=1)**2+df_stat_Xstd['sommequadX']**2)
         final['Std_Y']= np.sqrt(df_stat_Ymean.std(axis=1)**2+df_stat_Ystd['sommequadY']**2)
         
+        final['Nominal_X']= X_nominal
+        final['Nominal_Y']= Y_nominal
+        
         
         #Si on veut trier l'excel de X
         # =============================================================================
@@ -234,8 +237,8 @@ for x in dir_list:
         # =============================================================================
         
         if creat>0:
-            book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_setup.xlsx')
-            writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_setup.xlsx', engine='openpyxl')
+            book = load_workbook('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Erreurexp_3.xlsx')
+            writer = pd.ExcelWriter('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Erreurexp_3.xlsx', engine='openpyxl')
             writer.book = book
             writer.sheets = {ws.title: ws for ws in book.worksheets}
             
@@ -245,7 +248,7 @@ for x in dir_list:
             writer.save()
         
         if creat==0:
-            final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/Phoenix/Erreur_setup.xlsx',index=False)
+            final.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Erreurexp_3.xlsx',index=False)
             creat=creat+1
         
     
