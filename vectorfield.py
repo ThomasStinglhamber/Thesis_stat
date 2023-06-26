@@ -17,14 +17,15 @@ import os
 from openpyxl import load_workbook
 import matplotlib.colors as mcolors
 #from Spot_Analysis2 import *
+import random
 
 def multiple():
     #[0,45,90,180,270]
     #[0.015,0.1,0.5,1,2,5]
     #[70,100,150,200,226]
-    for k in [0,45,90,180,270]:
+    for k in [0]:
         # Load the data
-        df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Phoenix_Log.xlsx', header=0)
+        df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Phoenix_Log_Rot.xlsx', header=0)
         
         # Filter the data for a specific angle
         df = df.query('Angle =='+str(k)).query('Mu ==1').query('Energy ==200')
@@ -56,26 +57,28 @@ def single():
     # Load the data
     df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Phoenix_Log_Rot.xlsx', header=0)
     # Filter the data for a specific angle
-    df = df.query('Angle == 0')
+    df = df.query('Angle == 0').query('Mu == 1').query('Energy == 200')
     #df=df1-df2
     # Group the data by nominal X and Y coordinates and calculate the mean of the mean X and Y shifts for each group
     grouped_df = df.groupby(['Nominal_X', 'Nominal_Y'])[['Moyenne_X', 'Moyenne_Y']].mean()
     plt.figure()
     # Create a scatter plot of the nominal X and Y coordinates
-    plt.scatter(df['Nominal_X'], df['Nominal_Y'], marker='x')
-    
+    plt.scatter(df['Nominal_X'], df['Nominal_Y'], marker='x',label='Phoenix')
+    plt.scatter(df['Moyenne_X']*8+df['Nominal_X'], 8*df['Moyenne_Y']+df['Nominal_Y'], marker='x',label='Log')
     # Add an arrow from the nominal point to the mean point for each group
     for i, row in grouped_df.iterrows():
         dx_mean = row['Moyenne_X']
         dy_mean = row['Moyenne_Y']
         #plt.arrow(i[0], i[1], dx_mean, dy_mean, length_includes_head=True, head_width=0.02)
-        plt.quiver(i[0], i[1], dx_mean, dy_mean, scale=5)
+        #plt.quiver(i[0], i[1], dx_mean, dy_mean, scale=40)
+        #plt.plot(i[0] + dx_mean*2, i[1] + dy_mean*2, 'r+', markersize=10,)
         #plt.quiver(i[0], i[1], dx_mean, 0, scale=5)
         #plt.quiver(i[0]+dx_mean, i[1], 0, dy_mean, scale=5)
     
-    plt.title("Pheonix_log")
+    plt.title("Systematic shift between Phoenix and Log")
     plt.xlabel('X-coordinate [mm]')
     plt.ylabel('Y-coordinate [mm]')
+    plt.legend()
     plt.show()
     
     return
@@ -124,8 +127,8 @@ def two():
     plt.show()
 
 
-two()
-#single()
+#two()
+single()
 #multiple()
 
 
@@ -146,7 +149,7 @@ def two2():
     
         # Create a scatter plot of the nominal X and Y coordinates
         ax.scatter(df['Nominal_X'], df['Nominal_Y'], marker='x',color='black')
-    
+        ax.scatter(df['Moyenne_X'], df['Moyenne_Y'], marker='o',color='black')
         # Add an arrow from the nominal point to the mean point for each group
         for i, row in grouped_df.iterrows():
             dx_mean = row['Moyenne_X']

@@ -23,7 +23,7 @@ import matplotlib
 
 from ipywidgets import interact, fixed
 
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 plt.rcParams.update({'font.size': 12})
 
 X_nominal=[150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150,150,90,30,-30,-90,-150]
@@ -34,7 +34,7 @@ def interpolate_Moyenne_X(wanted):
     # read excel file into a pandas dataframe
     # Phoenix_Plan
     # Plan_Log
-    df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Plan_Log.xlsx', header=0)
+    df = pd.read_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Phoenix_Log_Rot.xlsx', header=0)
     df.sort_values(['Angle','Mu','Energy','Nominal_Y','Nominal_X'],ascending=[True,True,True,False,False], inplace=True,kind='mergesort')
     
     #df.to_excel('/Users/thomasstinglhamber/Desktop/Test_interp.xlsx',index=False)
@@ -107,42 +107,43 @@ def plan(x,y,angle,mu,energy,o,p):
         xi, yi = np.meshgrid(xi, yi)
         zi = griddata((x, y), z, (xi, yi), method='cubic')
         
-# =============================================================================
-#         # Plot the surface
-#         fig = plt.figure()
-#         ax = fig.add_subplot(111, projection='3d')
-#         ax.scatter(x,y,z,marker='x',color='r')
-#         ax.plot_surface(xi, yi, zi, cmap='viridis')
-#         plt.title('systematic error for : Angle = '+str(angle)+'°'+', Mu = '+str(round(mu,3))+', Energy = '+str(energy))
-#         plt.tight_layout()
-# 
-#         ax.set_xlabel('X-coordinate [mm]')
-#         ax.set_ylabel('Y-coordinate [mm]')
-#         if i[0]=='M':
-#             ax.set_zlabel('systematic shift in '+str(i[-1])+'-coordinate [mm]')
-#         
-#         else : ax.set_zlabel('random shift in '+str(i[-1])+'-coordinate [mm]')
-#         
-# =============================================================================
         # Plot the surface
-        
-        ax = fig.add_subplot(3, 3, o*3+p+1, projection='3d')
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
         ax.scatter(x,y,z,marker='x',color='r')
         ax.plot_surface(xi, yi, zi, cmap='viridis')
-        # Plan-Log
-        # Phoenix-Plan
-        plt.suptitle('Systematic error of Plan-Log for : ',fontsize=17)
-        plt.title('Angle = '+str(angle)+'°'+', Mu = '+str(round(mu,3))+', Energy = '+str(energy)+ ' MeV',fontsize=13)
-
-        ax.set_xlabel('X-coordinate [mm]',fontsize=11)
-        ax.set_ylabel('Y-coordinate [mm]',fontsize=11)
+        plt.title('Systematic shift for : Angle = '+str(angle)+'°'+', Mu = '+str(round(mu,3))+', Energy = '+str(energy)+' MeV')
+        plt.tight_layout()
+        #ax.set_ylim(-0.5, 1.5)
+        ax.set_zlim(-0.2, 1.5)
+        ax.set_xlabel('X-coordinate [mm]')
+        ax.set_ylabel('Y-coordinate [mm]')
         if i[0]=='M':
-            ax.set_zlabel('systematic shift in '+str(i[-1])+'-coordinate [mm]',fontsize=11)
+            ax.set_zlabel('systematic shift in '+str(i[-1])+'-coordinate [mm]')
         
-        else : ax.set_zlabel('random shift in '+str(i[-1])+'-coordinate [mm]',fontsize=11)
+        else : ax.set_zlabel('random shift in '+str(i[-1])+'-coordinate [mm]')
+        
+# =============================================================================
+#         # Plot the surface
+#         
+#         ax = fig.add_subplot(3, 3, o*3+p+1, projection='3d')
+#         ax.scatter(x,y,z,marker='x',color='r')
+#         ax.plot_surface(xi, yi, zi, cmap='viridis')
+#         # Plan-Log
+#         # Phoenix-Plan
+#         plt.suptitle('Systematic error of Plan-Log for : ',fontsize=17)
+#         plt.title('Angle = '+str(angle)+'°'+', Mu = '+str(round(mu,3))+', Energy = '+str(energy)+ ' MeV',fontsize=13)
+# 
+#         ax.set_xlabel('X-coordinate [mm]',fontsize=11)
+#         ax.set_ylabel('Y-coordinate [mm]',fontsize=11)
+#         if i[0]=='M':
+#             ax.set_zlabel('systematic shift in '+str(i[-1])+'-coordinate [mm]',fontsize=11)
+#         
+#         else : ax.set_zlabel('random shift in '+str(i[-1])+'-coordinate [mm]',fontsize=11)
+# =============================================================================
         
     #plt.show()
-    plt.savefig('/Users/thomasstinglhamber/Desktop/PHYS22M/P_L_evol_energy2.pdf')
+    plt.savefig('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/film/NEW3/Angle/'+str(angle)+'.png')
     pass 
 
 
@@ -160,17 +161,20 @@ def plan(x,y,angle,mu,energy,o,p):
 
 o=0
 p=0
-for l in np.arange(50,230,22):
-    plan(X_nominal,Y_nominal,0,1,l,o,p)
-    p=p+1
-    if p==3:
-        o=o+1
-        p=0
-    if p==3 and o==3:
-    #s=l/10
-        plt.savefig('/Users/thomasstinglhamber/Desktop/PHYS22M/evolmu2.pdf')
-        #plt.savefig('/Users/thomasstinglhamber/Desktop/test'+'.pdf')
-
-        plt.tight_layout()
-        plt.show()
+#plan(X_nominal,Y_nominal,45,1,150,o,p)
+for l in np.arange(0,360,5):
+    plan(X_nominal,Y_nominal,l,1,200,o,p)
+# =============================================================================
+#     p=p+1
+#     if p==3:
+#         o=o+1
+#         p=0
+#     if p==3 and o==3:
+#     #s=l/10
+#         plt.savefig('/Users/thomasstinglhamber/Desktop/PHYS22M/evolmu2.pdf')
+#         #plt.savefig('/Users/thomasstinglhamber/Desktop/test'+'.pdf')
+# 
+#         plt.tight_layout()
+#         plt.show()
+# =============================================================================
 

@@ -36,12 +36,15 @@ df3=df3.reset_index(drop = True)
 print(df1)
 print(df2)
 print(df3)
-result = df2.iloc[:,3:7] - df1.iloc[:,3:7]
+result = df2.iloc[:,3:5] - df1.iloc[:,3:5]
+
 
 
 result.insert(0, 'Angle', df1['Angle'])
 result.insert(1, 'Mu', df1['Mu'])
 result.insert(2, 'Energy', df1['Energy'])
+result.insert(5, 'Std_X', np.sqrt(df1['Std_X']**2+df2['Std_X']**2))
+result.insert(6, 'Std_Y', np.sqrt(df1['Std_Y']**2+df2['Std_Y']**2))
 result.insert(7, 'Nominal_X', df3['Nominal_X'])
 result.insert(8, 'Nominal_Y', df3['Nominal_Y'])
 result.insert(9, 'True_Angle', df1['Angle']-df3['True_Angle'])
@@ -51,5 +54,5 @@ result.insert(11, 'True_Mu', df1['Mu']-df3['True_Mu'])
 
 print(result)
 
-result.to_excel('/Users/thomasstinglhamber/Desktop/PHYS22M/Mémoire/Groningen/New2/Phoenix_Log_Rot.xlsx', index=False)
+result.to_excel('/Users/thomasstinglhamber/Desktop/Phoenix_Log_Rot2.xlsx', index=False)
 
